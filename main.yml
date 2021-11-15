@@ -1,0 +1,11 @@
+---
+- name: configures a rhel server
+  hosts: all
+  tasks:
+    - name: Add users and SSH keys
+      ansible.builtin.include_tasks:
+        name: tasks/add_user.yml
+
+    - name: Install Packages
+      ansible.builtin.include_tasks:
+        name: tasks/install_packages.yml
