@@ -1,0 +1,32 @@
+---
+- name: Remove packages related to Podman
+  ansible.builtin.yum:
+    state: absent
+    name: [docker, docker-client, docker-client-latest, docker-common, docker-latest, docker-latest-logrotate, docker-logrotate, docker-engine, podman, runc]
+
+- name: Get and place docker-ce.repo file
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Install Docker
+  ansible.builtin.yum:
+    name: [docker-ce, docker-ce-cli, containerd.io]
+    state: present
+
+- name: Start and enable Docker
+  ansible.builtin.service:
+    name: docker.service
+    state: started
+    enabled: true
+
+- name: Get and place docker-compose
+  ansible.builtin.get_url:
+    url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0711
+    owner: root
+    group: root

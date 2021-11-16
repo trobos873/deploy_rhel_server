@@ -1,0 +1,15 @@
+---
+- name: Copy banner in place
+  ansible.builtin.copy:
+    src: files/banner
+    dest: /etc/ssh/banner
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Add new banner to sshd conf
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#Banner"
+    line: "banner /etc/ssh/banner"
+  notify: restart sshd

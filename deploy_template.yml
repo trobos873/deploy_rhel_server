@@ -1,0 +1,67 @@
+---
+- name: Deploy RHEL server on VMware
+  hosts: localhost
+  become: no
+  gather_facts: false
+  vars_prompt:
+    - name: server_name
+      private: no
+      prompt: "Enter Server name (not FQDN)"
+
+    - name: cpu
+      private: no
+      prompt: "Enter a number of CPU cores"
+
+    - name: ram 
+      private: no
+      prompt: "Enter a amount of RAM (GB)"
+
+    - name: ip_addr
+      private: no
+      prompt: "Enter a IP address"
+
+    - name: vcenter_password
+      private: yes
+      unsafe: yes
+      prompt: "Enter password"
+  tasks:
+    - name: Deploy RHEL Template on VCSA
+      community.vmware.vmware_guest:
+        hostname: vcsa.home.trobos.net
+        username: "administrator@vsphere.local"
+        password: "{{ vcenter_password }}"
+        cluster: "Trobos Cluster"
+        datacenter: "Trobos DC"
+        folder: /Trobos DC/vm/
+        name: "{{ server_name }}"
+        state: present
+        template: RHEL8_Template
+        hardware:
+          num_cpus: "{{ cpu }}"
+          num_cpu_cores_per_socket: "{{ cpu }}"
+          scsi: paravirtual
+          memory_mb: "{{ 1024 * ram }}"
+          boot_firmware: "efi"
+        networks:
+          - name: LAN
+            ip: "{{ ip_addr }}"
+            netmask: 255.255.255.0
+            gateway: 192.168.1.1
+        customization:
+          dns_servers:
+            - 192.168.1.1
+          dns_suffix: home.trobos.net
+          domain: home.trobos.net
+        validate_certs: no
+      
+    - name: Powered on 
+      community.vmware.vmware_guest:
+        hostname: vcsa.home.trobos.net
+        username: "administrator@vsphere.local"
+        password: "{{ vcenter_password }}"
+        name: "{{ server_name }}"
+        state: poweredon
+        wait_for_ip_address: yes
+        validate_certs: no
+
+

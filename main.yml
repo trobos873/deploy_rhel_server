@@ -4,8 +4,24 @@
   tasks:
     - name: Add users and SSH keys
       ansible.builtin.include_tasks:
-        name: tasks/add_user.yml
+        file: tasks/add_user.yml
 
     - name: Install Packages
       ansible.builtin.include_tasks:
-        name: tasks/install_packages.yml
+        file: tasks/install_packages.yml
+
+    - name: Install Docker on hosts in the docker group
+      ansible.builtin.include_tasks:
+        file: tasks/install_docker.yml
+      when: "'rhel_docker_hosts' in group_names"
+
+    - name: setup ssh
+      ansible.builtin.include_tasks:
+        file: tasks/setup_ssh.yml
+
+  handlers:
+    - name: restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
+    

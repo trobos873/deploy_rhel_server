@@ -1,0 +1,32 @@
+---
+- name: Create admin group
+  ansible.builtin.group:
+    name: admins
+
+- name: Create sudo rules
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/admins
+    content: "%admins  ALL=(ALL) NOPASSWD:ALL"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: remove fucked file
+  ansible.builtin.file:
+    name: /etc/sudoers.d/admin
+    state: absent
+
+- name: Create user oskar
+  ansible.builtin.user:
+    name: oskar
+    state: present
+    groups: admins, docker
+
+- name: Add public keys to root and oskar
+  ansible.posix.authorized_key:
+    user: "{{ item }}"
+    state: present
+    key: "{{ lookup('file', 'files/public_keys') }}"
+  with_items:
+    - "root"
+    - "oskar"  

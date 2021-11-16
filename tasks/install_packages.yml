@@ -1,0 +1,21 @@
+---
+- name: ensure cockpit is installed
+  ansible.builtin.package:
+    name: cockpit
+    state: present
+
+- name: enable cockpit
+  ansible.builtin.service:
+    name: cockpit.socket
+    state: started
+    enabled: true
+
+- name: install vim 
+  ansible.builtin.package:
+    name: vim
+    state: present
+
+- name: install open-vm-tools
+  ansible.builtin.package:
+    name: open-vm-tools
+    state: present
