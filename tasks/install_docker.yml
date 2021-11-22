@@ -27,6 +27,30 @@
   ansible.builtin.get_url:
     url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
     dest: /usr/local/bin/docker-compose
-    mode: 0711
+    mode: 0755
     owner: root
     group: root
+
+- name: Place file for autocomplete docker-compose
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose
+    dest: /etc/bash_completion.d/docker-compose
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Ensure docker-compose is correct ownership
+  ansible.builtin.file:
+    name: /usr/local/bin/docker-compose
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Remove packages that destory updates
+  ansible.builtin.package:
+    name: 
+      - containers-common
+      - cockpit-docker
+    state: absent
+    
+
